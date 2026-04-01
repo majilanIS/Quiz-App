@@ -19,11 +19,11 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 UI design for the Quiz App
 Landing-Page UI
-![alt text](image-2.png)
+![Landing Design](assets/design-images/image-2.png)
 Quiz-Page
-![alt text](image-3.png)
+![Quiz page design](assets/design-images/image-3.png)
 Result-Page
-![alt text](image-4.png)
+![Result page](assets/design-images/image-4.png)
 
 ---
 
