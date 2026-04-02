@@ -22,8 +22,8 @@ const timers = [
 ];
 
 const modes = [
-  { label: "📘 Study Mode", value: "study" },
-  { label: "📝 Exam Mode", value: "exam" },
+  { label: "📘 Study", value: "study" },
+  { label: "📝 Exam", value: "exam" },
 ];
 
 export default function Index({navigation}) {
@@ -143,7 +143,7 @@ export default function Index({navigation}) {
 
         {/* Start Quiz Button */}
         <UIButton
-          label="[ Start Quiz ]"
+          label=" Start Quiz "
           onPress={handleStart} 
           style={[styles.startBtn, { backgroundColor: theme.primary }]}
           textStyle={{ color: theme.buttonText, fontSize: 18 }}
@@ -198,6 +198,15 @@ const styles = StyleSheet.create({
   },
   modeBtn: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 4,
+    borderRadius: 20,
+    paddingVertical: 10,
+    backgroundColor: '#E5E7EB',
+  },
+  startBtn: {
     marginHorizontal: 4,
     borderRadius: 20,
     paddingVertical: 10,

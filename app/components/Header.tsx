@@ -7,18 +7,19 @@ const Header = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-
-      {/* TOP ROW */}
+      
       <View style={styles.topRow}>
+        
+        {/* LEFT SIDE */}
         <View style={styles.leftSection}>
           <Image
-            source={require('../../assets/images/logo_icon.png')}
+            source={require('../../assets/images/logo_icon-1.png')}
             style={styles.logo}
           />
 
           <View>
             <Text style={[styles.title, { color: theme.text }]}>
-              Quiz Master
+              Quiz Master <Text style={styles.appName}>App</Text>
             </Text>
             <Text style={[styles.subtitle, { color: theme.subText }]}>
               Test your knowledge
@@ -26,25 +27,20 @@ const Header = () => {
           </View>
         </View>
 
-        {/* THEME SWITCH */}
-        <View style={styles.switchContainer}>
+        {/* SWITCH */}
+        <View style={styles.switchWrapper}>
           <Switch
             value={isDark}
             onValueChange={toggleTheme}
-            thumbColor={isDark ? '#fff' : '#f4f3f4'}
-            trackColor={{ false: '#ccc', true: theme.primary }}
-            style={styles.switch}
+            thumbColor={isDark ? '#ffffff' : '#f4f4f5'}
+            trackColor={{
+              false: '#d1d5db',
+              true: '#6366f1', 
+            }}
           />
         </View>
-      </View>
 
-      {/* DIVIDER */}
-      <View
-        style={[
-          styles.divider,
-          { backgroundColor: isDark ? '#2a2a2a' : '#e5e7eb' },
-        ]}
-      />
+      </View>
     </View>
   );
 };
@@ -54,64 +50,54 @@ export default Header;
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingTop: 20,
-    paddingBottom: 12,
+    paddingTop: 16,
+    paddingBottom: 14,
     paddingHorizontal: 16,
+
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
 
-    // subtle shadow
+    // clean shadow
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
   },
 
   topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
 
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
   },
 
   logo: {
-    width: 40,
-    height: 60,
-    borderRadius: 12,
+    width: 80,
+    height: 80,
+    borderRadius: 14,
+    marginRight: 12,
   },
 
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: '700',
-    letterSpacing: 0.5,
   },
-
+  appName: {
+    color: '#6366f1',  
+  },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     marginTop: 2,
     opacity: 0.7,
   },
 
-  switchContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  switch: {
-    transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
-    height: 30,
-    width: 50,
-  },
-
-  divider: {
-    marginTop: 12,
-    height: 1,
-    width: '100%',
-    borderRadius: 10,
+  switchWrapper: {
+    padding: 10,
+    borderRadius: 50,
+    backgroundColor: 'rgba(99,102,241,0.08)', // soft glow
   },
 });

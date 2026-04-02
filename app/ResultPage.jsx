@@ -12,29 +12,40 @@ export default function ResultPage() {
   const { theme } = useTheme();
   const [savedBreakdown, setSavedBreakdown] = useState([]);
 
-useEffect(() => {
-  const loadBreakdown = async () => {
-    try {
-      const json = await AsyncStorage.getItem('@quiz_breakdown');
-      if (json != null) {
-        setSavedBreakdown(JSON.parse(json));
+  // Load saved breakdown from AsyncStorage
+  useEffect(() => {
+    const loadBreakdown = async () => {
+      try {
+        const json = await AsyncStorage.getItem('@quiz_breakdown');
+        if (json != null) {
+          setSavedBreakdown(JSON.parse(json));
+        }
+      } catch (e) {
+        console.log('Error loading quiz breakdown', e);
       }
-    } catch (e) {
-      console.log('Error loading quiz breakdown', e);
+    };
+    loadBreakdown();
+  }, []);
+
+  // Determine the breakdown to display
+  let breakdown = savedBreakdown;
+  if (params.breakdown) {
+    try {
+      breakdown = typeof params.breakdown === 'string'
+        ? JSON.parse(params.breakdown)
+        : Array.isArray(params.breakdown)
+          ? params.breakdown
+          : savedBreakdown;
+    } catch {
+      breakdown = savedBreakdown;
     }
-  };
+  }
 
-  loadBreakdown();
-}, []);
-
-  const breakdown = params.breakdown ? JSON.parse(params.breakdown) : savedBreakdown;
   const score = Number(params.score) || 0;
   const total = Number(params.total) || 0;
-  const timeUsed = params.timeUsed;
-  const totalSeconds = Number(timeUsed) || 0;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
+  const timeUsed = Number(params.timeUsed) || 0; // ensure number
+  const minutes = Math.floor(timeUsed / 60);
+  const seconds = timeUsed % 60;
   const percent = total > 0 ? Math.round((score / total) * 100) : 0;
 
   return (
@@ -44,7 +55,8 @@ useEffect(() => {
         { backgroundColor: theme.background }
       ]}
     >
-    <Header />
+      <Header />
+
       <Text style={[styles.header, { color: theme.text }]}>
         🎉 YOUR RESULT
       </Text>
@@ -64,34 +76,36 @@ useEffect(() => {
       <Text style={[styles.time, { color: theme.text }]}>
         <Ionicons name="timer" size={16} color={theme.text} />{' '}
         Time Used: {minutes}:{seconds < 10 ? '0' : ''}{seconds}
-    </Text>
+      </Text>
 
       <View style={[styles.breakdownBox, { backgroundColor: theme.card }]}>
-      <Text style={[styles.breakdownTitle, { color: theme.text }]}>📊 BREAKDOWN:</Text>
+        <Text style={[styles.breakdownTitle, { color: theme.text }]}>
+          📊 BREAKDOWN:
+        </Text>
 
-      {savedBreakdown.map((item, idx) => (
-        <View key={idx} style={{ marginBottom: 12 }}>
-          <Text style={{ color: theme.text, fontWeight: 'bold' }}>
-            Q{item.q}: {item.question}
-          </Text>
-          {item.options.map((opt, i) => (
-            <Text
-              key={i}
-              style={{
-                color:
-                  opt === item.answer
-                    ? 'green'
-                    : opt === item.selectedAnswer
-                    ? 'red'
-                    : theme.text,
-              }}
-            >
-              {opt} {opt === item.answer ? '✔️' : opt === item.selectedAnswer ? '❌' : ''}
+        {breakdown.map((item, idx) => (
+          <View key={idx} style={{ marginBottom: 12 }}>
+            <Text style={{ color: theme.text, fontWeight: 'bold' }}>
+              Q{item.q}: {item.question}
             </Text>
-          ))}
-        </View>
-      ))}
-    </View>
+            {item.options.map((opt, i) => (
+              <Text
+                key={i}
+                style={{
+                  color:
+                    opt === item.answer
+                      ? 'green'
+                      : opt === item.selectedAnswer
+                      ? 'red'
+                      : theme.text,
+                }}
+              >
+                {opt} {opt === item.answer ? '✔️' : opt === item.selectedAnswer ? '❌' : ''}
+              </Text>
+            ))}
+          </View>
+        ))}
+      </View>
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
@@ -108,69 +122,71 @@ useEffect(() => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#f8f9fa',
     alignItems: 'center',
     padding: 24,
   },
-  darkContainer: { backgroundColor: '#181c24' },
-  header: { fontSize: 28, fontWeight: 'bold', marginTop: 24, color: '#222', textAlign: 'center' },
-  darkHeader: { color: '#fff' },
-  scoreRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 16 },
-  score: { fontSize: 24, color: '#222' },
-  darkScore: { color: '#fff' },
-  bold: { fontWeight: 'bold', fontSize: 28 },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginTop: 24,
+    textAlign: 'center',
+  },
+  scoreRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginVertical: 16 
+  },
+  score: { 
+    fontSize: 24 
+  },
+  bold: { 
+    fontWeight: 'bold', 
+    fontSize: 28 
+  },
   circle: {
     marginLeft: 16,
     width: 60,
     height: 60,
     borderRadius: 30,
     borderWidth: 4,
-    borderColor: '#00bfff',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#e6f7ff',
   },
-  percent: { fontSize: 18, color: '#00bfff', fontWeight: 'bold' },
-  time: { fontSize: 16, marginVertical: 4, color: '#555' },
-  performance: { fontSize: 16, marginVertical: 4, color: '#ff6600', fontWeight: 'bold' },
-  icon: { marginRight: 8 },
+  percent: { 
+    fontSize: 18, 
+    fontWeight: 'bold' 
+  },
+  time: { 
+    fontSize: 16, 
+    marginVertical: 4 
+  },
   breakdownBox: {
     flexDirection: 'column',
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     marginVertical: 16,
-    width: '50%',
+    width: '100%',
+    maxWidth: 400,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
   },
-  darkBreakdownBox: { backgroundColor: '#232a36' },
-  breakdownTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8, color: '#222' },
-  breakdownRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  breakdownItem: { 
-     flexDirection: 'column',
-     fontSize: 20,
-     marginRight: 16, 
-     marginBottom: 8, 
-    },
-  correct: { color: '#00c853', fontWeight: 'bold' },
-  incorrect: { color: '#d32f2f', fontWeight: 'bold' },
+  breakdownTitle: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    marginBottom: 8 
+  },
   buttonRow: { 
     flexDirection: 'row', 
     justifyContent: 'center',
-    gap: 16,
+    marginTop: 16,
   },
   button: {
-    backgroundColor: '#e6f0fa',
-    color: '#007aff',
-    fontSize: 18,
-    textAlign: 'center',
     padding: 14,
     borderRadius: 12,
-    marginBottom: 12,
+    textAlign: 'center',
     fontWeight: 'bold',
   },
-  darkButton: { backgroundColor: '#232a36', color: '#00bfff' },
 });
