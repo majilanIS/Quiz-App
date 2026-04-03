@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, Switch } from 'react-native';
 import { useTheme } from '../context/useTheme';
 
-const Header = () => {
+const Header = ({showThemeToggle=false}) => {
   const { theme, isDark, toggleTheme } = useTheme();
 
   return (
@@ -27,19 +27,21 @@ const Header = () => {
           </View>
         </View>
 
-        {/* SWITCH */}
-        <View style={styles.switchWrapper}>
-          <Switch
-            value={isDark}
-            onValueChange={toggleTheme}
-            thumbColor={isDark ? '#ffffff' : '#f4f4f5'}
-            trackColor={{
-              false: '#d1d5db',
-              true: '#6366f1', 
-            }}
-          />
-        </View>
-
+            {/* SWITCH */}
+        {
+          showThemeToggle && (
+          <View style={styles.switchWrapper}>
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              thumbColor={isDark ? '#ffffff' : '#f4f4f5'}
+              trackColor={{
+                false: '#d1d5db',
+                true: '#6366f1', 
+              }}
+            />
+          </View>
+          )}
       </View>
     </View>
   );
@@ -76,8 +78,8 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     borderRadius: 14,
     marginRight: 12,
   },
@@ -97,7 +99,7 @@ const styles = StyleSheet.create({
 
   switchWrapper: {
     padding: 10,
-    borderRadius: 50,
-    backgroundColor: 'rgba(99,102,241,0.08)', // soft glow
+    // borderRadius: 10,
+    // backgroundColor: 'rgba(99,102,241,0.08)', 
   },
 });

@@ -59,7 +59,7 @@ export default function Index({navigation}) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Header />
+      <Header showThemeToggle={true}/>
       <View style={[styles.card, { backgroundColor: theme.card, shadowColor: theme.text }]}>
         
         {/* Category Selection */}
