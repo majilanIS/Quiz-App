@@ -5,6 +5,7 @@ import { useTheme } from './context/useTheme';
 import { Ionicons } from '@expo/vector-icons';
 import Header from './components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 export default function ResultPage() {
   const router = useRouter();
@@ -31,9 +32,10 @@ export default function ResultPage() {
   let breakdown = savedBreakdown;
   if (params.breakdown) {
     try {
-      breakdown = typeof params.breakdown === 'string'
-        ? JSON.parse(params.breakdown)
-        : Array.isArray(params.breakdown)
+      breakdown =
+        typeof params.breakdown === 'string'
+          ? JSON.parse(params.breakdown)
+          : Array.isArray(params.breakdown)
           ? params.breakdown
           : savedBreakdown;
     } catch {
@@ -43,18 +45,13 @@ export default function ResultPage() {
 
   const score = Number(params.score) || 0;
   const total = Number(params.total) || 0;
-  const timeUsed = Number(params.timeUsed) || 0; // ensure number
+  const timeUsed = Number(params.timeUsed) || 0;
   const minutes = Math.floor(timeUsed / 60);
   const seconds = timeUsed % 60;
   const percent = total > 0 ? Math.round((score / total) * 100) : 0;
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: theme.background }
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Header />
 
       <Text style={[styles.header, { color: theme.text }]}>
@@ -66,11 +63,21 @@ export default function ResultPage() {
           Score: <Text style={styles.bold}>{score}</Text> / {total}
         </Text>
 
-        <View style={[styles.circle, { borderColor: theme.primary }]}>
-          <Text style={[styles.percent, { color: theme.primary }]}>
-            {percent}%
-          </Text>
-        </View>
+        <AnimatedCircularProgress
+          size={70}
+          width={6}
+          fill={percent}
+          tintColor={theme.primary}
+          backgroundColor={theme.border}
+          rotation={0}
+          lineCap="round"
+        >
+          {() => (
+            <Text style={[styles.percent, { color: theme.primary }]}>
+              {percent}%
+            </Text>
+          )}
+        </AnimatedCircularProgress>
       </View>
 
       <Text style={[styles.time, { color: theme.text }]}>
@@ -78,88 +85,103 @@ export default function ResultPage() {
         Time Used: {minutes}:{seconds < 10 ? '0' : ''}{seconds}
       </Text>
 
-      <View style={[styles.breakdownBox, { backgroundColor: theme.card }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.breakdownBox,
+          {
+            backgroundColor: theme.card,
+          },
+        ]}
+        showsVerticalScrollIndicator={true} 
+        indicatorStyle='red'
+      >
         <Text style={[styles.breakdownTitle, { color: theme.text }]}>
           📊 BREAKDOWN:
         </Text>
 
-        {breakdown.map((item, idx) => (
-          <View key={idx} style={{ marginBottom: 12 }}>
-            <Text style={{ color: theme.text, fontWeight: 'bold' }}>
-              Q{item.q}: {item.question}
-            </Text>
-            {item.options.map((opt, i) => (
-              <Text
-                key={i}
-                style={{
-                  color:
-                    opt === item.answer
-                      ? 'green'
-                      : opt === item.selectedAnswer
-                      ? 'red'
-                      : theme.text,
-                }}
-              >
-                {opt} {opt === item.answer ? '✔️' : opt === item.selectedAnswer ? '❌' : ''}
+        {Array.isArray(breakdown) && breakdown.length > 0 ? (
+          breakdown.map((item, idx) => (
+            <View key={item.q || idx} style={{ marginBottom: 12 }}>
+              <Text style={{ color: theme.text, fontWeight: 'bold' }}>
+                Q{item.q}: {item.question}
               </Text>
-            ))}
-          </View>
-        ))}
-      </View>
+
+              {item.options.map((opt, i) => (
+                <Text
+                  key={i}
+                  style={{
+                    color:
+                      opt === item.answer
+                        ? 'green'
+                        : opt === item.selectedAnswer
+                        ? 'red'
+                        : theme.text,
+                  }}
+                >
+                  {opt}{' '}
+                  {opt === item.answer
+                    ? '✔️'
+                    : opt === item.selectedAnswer
+                    ? '❌'
+                    : ''}
+                </Text>
+              ))}
+            </View>
+          ))
+        ) : (
+          <Text style={{ color: theme.text }}>
+            No breakdown available
+          </Text>
+        )}
+      </ScrollView>
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: theme.card }]}
-          onPress={() => router.push('/')}
+          onPress={() => router.replace('/')} // ✅ better navigation
         >
-          <Text style={{ color: theme.primary }}>Restart Quiz</Text>
+          <Text style={{ color: theme.text }}>
+            Restart Quiz
+          </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1, // ✅ fixed (was flexGrow)
     alignItems: 'center',
     padding: 24,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 24,
+    marginTop: 18,
     textAlign: 'center',
   },
-  scoreRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginVertical: 16 
-  },
-  score: { 
-    fontSize: 24 
-  },
-  bold: { 
-    fontWeight: 'bold', 
-    fontSize: 28 
-  },
-  circle: {
-    marginLeft: 16,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 4,
+  scoreRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#e6f7ff',
+    marginVertical: 10,
+    gap: 16, 
   },
-  percent: { 
-    fontSize: 18, 
-    fontWeight: 'bold' 
+  score: {
+    fontSize: 24,
   },
-  time: { 
-    fontSize: 16, 
-    marginVertical: 4 
+  bold: {
+    fontWeight: 'bold',
+    fontSize: 28,
+  },
+  percent: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  time: {
+    fontSize: 16,
+    marginTop: 8,
+    marginBottom: 10,
   },
   breakdownBox: {
     flexDirection: 'column',
@@ -168,18 +190,18 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     width: '100%',
     maxWidth: 400,
-    shadowColor: '#000',
+    shadowColor: '#000', // ✅ keep consistent shadow
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 2,
   },
-  breakdownTitle: { 
-    fontSize: 18, 
-    fontWeight: 'bold', 
-    marginBottom: 8 
+  breakdownTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
-  buttonRow: { 
-    flexDirection: 'row', 
+  buttonRow: {
+    flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 16,
   },
@@ -188,5 +210,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     textAlign: 'center',
     fontWeight: 'bold',
+    marginBottom: 50,
   },
 });
