@@ -1,15 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-type UIButtonProps = {
-  label: string;
-  onPress: (event: GestureResponderEvent) => void;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-  disabled?: boolean;
-};
-
-const UIButton: React.FC<UIButtonProps> = ({ label, onPress, style, textStyle, disabled }) => {
+const UIButton = ({ label, onPress, style, textStyle, disabled }) => {
   return (
     <TouchableOpacity
       style={[styles.button, style, disabled && styles.disabled]}

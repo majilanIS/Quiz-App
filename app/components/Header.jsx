@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Switch } from 'react-native';
-import { useTheme } from '../context/useTheme';
+import  useTheme  from '../context/useTheme';
 
 const Header = ({showThemeToggle=false}) => {
   const { theme, isDark, toggleTheme } = useTheme();
